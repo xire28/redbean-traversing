@@ -37,7 +37,7 @@ composer require xire28/redbean-traversing
 class CountryTraversingDecorator extends \RedbeanTraversing\TraversingDecorator
 {
     public function people(){
-      return $this->hasManyThrough('ownPerson', ['ownState']);
+      return $this->hasManyThrough(['ownState', 'ownPerson']);
     }
 }
 
