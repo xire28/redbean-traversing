@@ -9,7 +9,7 @@ class TraversingDecorator extends Decorator {
 	*
 	* @return array[OODBBean]
 	*/
-	protected function traverseWithScope($association, $scope){
+	public function traverseWithScope($association, $scope){
 		return array_filter($this->{$association}?: [], $scope);
 	}
 
@@ -19,7 +19,7 @@ class TraversingDecorator extends Decorator {
 	*
 	* @return OODBBean | NULL 
 	*/ 
-	protected function hasOneThrough($associations) {
+	public function hasOneThrough($associations) {
 		$associated = static::traverseMany([$this->object], $associations);
 		return array_shift($associated);
 	}
@@ -30,11 +30,9 @@ class TraversingDecorator extends Decorator {
 	*
 	* @return array[OODBBean]
 	*/
-	protected function hasManyThrough($associations) {
+	public function hasManyThrough($associations) {
 		return static::traverseMany([$this->object], $associations);
 	}
-
-
 
 	/** 
 	* Retrieve beans through nested associations on multiple beans of the same type (recursive) and decorate them if a decoration function if defined
@@ -70,8 +68,8 @@ class TraversingDecorator extends Decorator {
 	*/
     protected static function tryDecorateBean($bean) {
     	$capitalizedType = ucfirst($bean->getMeta('type'));
-    	$function = "decorate{$capitalizedType}";
-    	return is_callable($function)? $function($bean) : $bean;
+    	$decorator = "decorate{$capitalizedType}";
+    	return is_callable($decorator)? $decorator($bean) : $bean;
     }
 
 	/**
