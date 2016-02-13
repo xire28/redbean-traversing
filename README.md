@@ -132,6 +132,7 @@ foreach($usa->personOlderThan(20) as $person){
 }
 echo '</ul>';
 ?>
+```
 
 #### Output
 ```
