@@ -1,6 +1,6 @@
 <?php namespace RedbeanTraversing;
 
-class TraversingDecorator extends Decorator {
+trait ModelTraversing {
 
 	/** 
 	* Traverse association with scope
@@ -19,8 +19,8 @@ class TraversingDecorator extends Decorator {
 	*
 	* @return OODBBean | NULL 
 	*/ 
-	public function hasOneThrough($associations) {
-		$associated = static::traverseMany([$this->object], $associations);
+	public function oneThrough($associations) {
+		$associated = static::traverseMany([$this], $associations);
 		return array_shift($associated);
 	}
 
@@ -30,8 +30,8 @@ class TraversingDecorator extends Decorator {
 	*
 	* @return array[OODBBean]
 	*/
-	public function hasManyThrough($associations) {
-		return static::traverseMany([$this->object], $associations);
+	public function manyThrough($associations) {
+		return static::traverseMany([$this], $associations);
 	}
 
 	/** 
@@ -42,11 +42,11 @@ class TraversingDecorator extends Decorator {
 	* @return OODBBean | NULL 
 	*/
 	protected static function traverseMany($beans, $associations) {
-   		$associated = array_map('static::tryDecorateBean', static::flatMapAssociation($beans, array_shift($associations)));
+   		$associated = static::flatMapAssociation($beans, array_shift($associations));
 	    return count($associations) > 0 ? static::traverseMany($associated, $associations) : $associated;
     }
 
-    /** 
+    /**
 	* Retrieve beans through the association on multiple beans
 	* @param OODBBean $bean
 	* @param string | array[function [, array]] $association Association to traverse
@@ -59,25 +59,4 @@ class TraversingDecorator extends Decorator {
     		return array_wrap($associated);
 		}, $beans)));
     }
-
-    /** 
-	* Try to decorate a bean using his decoration function (allows to define and use custom associations on intermediary beans)
-	* @param OODBBean $bean
-	* 
-	* @return Decorator
-	*/
-    protected static function tryDecorateBean($bean) {
-    	$capitalizedType = ucfirst($bean->getMeta('type'));
-    	$decorator = "decorate{$capitalizedType}";
-    	return is_callable($decorator)? $decorator($bean) : $bean;
-    }
-
-	/**
-	* @param $property
-	*
-	* @return mixed
-	*/
-	public function __get($property) {
-		return method_exists($this, $property)? $this->$property() : parent::__get($property);
-	}
 }

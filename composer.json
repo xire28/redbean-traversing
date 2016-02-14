@@ -1,8 +1,8 @@
 {
     "name": "xire28/redbean-traversing",
     "type": "library",
-    "description": "Add traversing through associations for redbeans using decorators",
-    "keywords": ["redbean", "traversing", "decorators", "has many through", "has one through", "scope"],
+    "description": "Add traversing through associations for redbeans",
+    "keywords": ["redbean", "traversing", "trait", "has many through", "has one through", "scope"],
     "homepage": "https://github.com/xire28/redbean-traversing",
     "license": "MIT",
     "require": {

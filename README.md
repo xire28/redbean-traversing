@@ -1,5 +1,5 @@
 # Redbean traversing
-Add traversing through associations for redbeans using decorators
+Add traversing through associations for redbeans
 
 ## Requirements
 
@@ -34,17 +34,17 @@ composer require xire28/redbean-traversing
 ```
 <?php
 
-class CountryTraversingDecorator extends \RedbeanTraversing\TraversingDecorator
+class Model_Country extends RedBean_SimpleModel
 {
     public function people(){
-      return $this->hasManyThrough(['ownState', 'ownPerson']);
+      return $this->manyThrough(['ownState', 'ownPerson']);
     }
 }
 
-$usa = new CountryTraversingDecorator(R::load('country', 1));
+$usa = R::load('country', 1);
 
 echo '<ul>';
-foreach($usa->people as $person){
+foreach($usa->people() as $person){
 	echo "<li>{$person->fullName}</li>";
 }
 echo '</ul>';
@@ -65,15 +65,15 @@ echo '</ul>';
 
 ```
 <?php
-class PersonTraversingDecorator extends \RedbeanTraversing\TraversingDecorator
+class Model_Person extends RedBean_SimpleModel
 {
-    public function country(){
-      return $this->hasOneThrough(['state', 'country']);
-    }
+  public function country(){
+    return $this->oneThrough(['state', 'country']);
+  }
 }
 
-$lionelRichie = new PersonTraversingDecorator(R::load('person', 1));
-echo $lionelRichie->country->name;
+$lionelRichie = R::load('person', 1);
+echo $lionelRichie->country()->name;
 ?>
 ```
 
@@ -82,55 +82,38 @@ echo $lionelRichie->country->name;
 United States of America
 ```
 
-### Use scoped associations
-#### Define global decorator builders
-##### Note
-- Naming convention: "decorate" + capitablized bean type
-- Functions are called when decorating nested associations
-
+### Retrieve associations using named scopes
 ```
 <?php
-function decorateCountry($country){
-	return new CountryTraversingDecorator($country);
-}
 
-function decorateState($state){
-	return new StateTraversingDecorator($state);
-}
-?>
-```
-
-#### Define traversing decorators
-
-```
-<?php
-class CountryTraversingDecorator extends \RedbeanTraversing\TraversingDecorator
+class BaseModel extends RedBean_SimpleModel
 {
-    public function personOlderThan($age){
-      return $this->hasManyThrough(['ownState', ['personOlderThan', $age]]);
-    }
+  use RedbeanTraversing\ModelTraversing;
 }
 
-class StateTraversingDecorator extends \RedbeanTraversing\TraversingDecorator
+class Model_Country extends BaseModel
 {
-    public function personOlderThan($age){
-      return $this->traverseWithScope('ownPerson', function($person) use ($age){
-      	return (new Datetime('now'))->format('Y') - (new DateTime($person->bornAt))->format('Y') > $age;
-      });
-    }
+  public function personOlderThan($age){
+    return $this->manyThrough(['ownState', ['personOlderThan', $age]]);
+  }
 }
-?>
-```
 
-#### Main
-```
-<?php
-$usa = decorateCountry(R::load('country', 1));
+class Model_State extends BaseModel
+{
+  public function personOlderThan($age){
+    return $this->traverseWithScope('ownPerson', function($person) use ($age){
+      return (new Datetime('now'))->format('Y') - (new DateTime($person->bornAt))->format('Y') > $age;
+    });
+  }
+}
+
+$usa = R::load('country', 1);
 echo '<ul>';
 foreach($usa->personOlderThan(20) as $person){
 	echo "<li>{$person->fullName}</li>";
 }
 echo '</ul>';
+
 ?>
 ```
 
@@ -140,3 +123,32 @@ echo '</ul>';
 - Felicia Day
 - Emma Stone
 ```
+
+### Retrieve associations using unnamed scopes
+
+```
+<?php
+
+class Model_Country extends RedBean_SimpleModel
+{
+	use RedbeanTraversing\ModelTraversing;
+}
+
+$usa = R::load('country', 1);
+
+echo '<ul>';
+foreach($usa->manyThrough(['ownState', ['traverseWithScope', ['ownPerson', function($person){
+  return strpos($person->fullName, 'A') === 0;
+}]]]) as $person){
+	echo "<li>{$person->fullName}</li>";
+}
+
+R::close();
+?>
+```
+
+#### Output
+```
+- Anna Graceman
+```
+
