@@ -65,6 +65,7 @@ echo '</ul>';
 
 ```
 <?php
+
 class Model_Person extends RedBean_SimpleModel
 {
   public function country(){
@@ -83,7 +84,7 @@ echo $lionelRichie->country()->name;
 United States of America
 ```
 
-### Retrieve associations using named scopes
+### Retrieve all adult persons in the usa using named scopes
 ```
 <?php
 
@@ -110,7 +111,7 @@ class Model_State extends BaseModel
 
 $usa = R::load('country', 1);
 echo '<ul>';
-foreach($usa->personOlderThan(20) as $person){
+foreach($usa->personOlderThan(18) as $person){
 	echo "<li>{$person->fullName}</li>";
 }
 echo '</ul>';
@@ -125,7 +126,7 @@ echo '</ul>';
 - Emma Stone
 ```
 
-### Retrieve associations using unnamed scopes
+### Retrieve all persons starting with `a` in the usa using unnamed scopes
 
 ```
 <?php
