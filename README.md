@@ -36,9 +36,10 @@ composer require xire28/redbean-traversing
 
 class Model_Country extends RedBean_SimpleModel
 {
-    public function people(){
-      return $this->manyThrough(['ownState', 'ownPerson']);
-    }
+  use RedbeanTraversing\ModelTraversing;
+  public function people(){
+    return $this->manyThrough(['ownState', 'ownPerson']);
+  }
 }
 
 $usa = R::load('country', 1);
@@ -68,6 +69,7 @@ echo '</ul>';
 
 class Model_Person extends RedBean_SimpleModel
 {
+  use RedbeanTraversing\ModelTraversing;
   public function country(){
     return $this->oneThrough(['state', 'country']);
   }
@@ -111,7 +113,7 @@ class Model_State extends BaseModel
 
 $usa = R::load('country', 1);
 echo '<ul>';
-foreach($usa->personOlderThan(18) as $person){
+foreach($usa->personOlderThan(17) as $person){
 	echo "<li>{$person->fullName}</li>";
 }
 echo '</ul>';
