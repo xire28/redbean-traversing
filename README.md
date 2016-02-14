@@ -157,6 +157,7 @@ foreach($usa->manyThrough(['ownState', ['traverseWithScope', ['ownPerson', funct
 }]]]) as $person){
 	echo "<li>{$person->fullName}</li>";
 }
+echo '</ul>';
 
 R::close();
 
