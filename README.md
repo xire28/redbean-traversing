@@ -105,9 +105,20 @@ class Model_Country extends BaseModel
 class Model_State extends BaseModel
 {
   public function personOlderThan($age){
-    return $this->traverseWithScope('ownPerson', function($person) use ($age){
-      return (new Datetime('now'))->format('Y') - (new DateTime($person->bornAt))->format('Y') > $age;
-    });
+    return $this->traverseWithScope('ownPerson', Model_Person::olderThanScope($age));
+  }
+}
+
+class Model_Person extends BaseModel
+{
+  public function isOlderThan($age){
+    return (new Datetime('now'))->format('Y') - (new DateTime($this->bornAt))->format('Y') > $age;
+  }
+
+  public static function olderThanScope($age){
+    return function($person) use ($age){
+      return $person->isOlderThan($age);
+    };
   }
 }
 
