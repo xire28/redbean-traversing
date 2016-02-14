@@ -3,7 +3,7 @@ Add traversing through associations for redbeans
 
 ## Requirements
 
-- PHP >= 5.3.0
+- PHP >= 5.4.0
 
 ## Install
 ### Using Composer
