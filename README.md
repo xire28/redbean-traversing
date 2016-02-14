@@ -74,6 +74,7 @@ class Model_Person extends RedBean_SimpleModel
 
 $lionelRichie = R::load('person', 1);
 echo $lionelRichie->country()->name;
+
 ?>
 ```
 
@@ -144,6 +145,7 @@ foreach($usa->manyThrough(['ownState', ['traverseWithScope', ['ownPerson', funct
 }
 
 R::close();
+
 ?>
 ```
 
