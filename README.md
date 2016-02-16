@@ -76,7 +76,7 @@ class BaseModel extends RedBean_SimpleModel
 class Model_Country extends BaseModel
 {
 	public function adultPersons(){
-    	return $this->proxy()->ownState->_and()->isAdult()->ownPerson;
+    	return $this->multi()->ownState->_and()->isAdult()->ownPerson;
 	}
 }
 
