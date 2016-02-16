@@ -76,7 +76,7 @@ class BaseModel extends RedBean_SimpleModel
 class Model_Country extends BaseModel
 {
 	public function adultPersons(){
-    	return $this->multi()->ownState->_and()->isAdult()->ownPerson;
+    	return $this->multi()->ownState->isAdult()->ownPerson;
 	}
 }
 
@@ -125,7 +125,7 @@ class Model_State extends BaseModel {}
 
 $usa = R::load('country', 1);
 echo '<ul>';
-foreach($usa->multi()->_and()->group(function($q){ return $q->where('name LIKE "Ar%"')->_or()->where('name = ?', 'Alabama'); })->ownState->ownPerson as $person){
+foreach($usa->multi()->group(function($q){ return $q->where('name LIKE "Ar%"')->_or()->where('name = ?', 'Alabama'); })->ownState->ownPerson as $person){
 	echo "<li>{$person->fullName}</li>";
 }
 echo '</ul>';

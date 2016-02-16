@@ -1,7 +1,7 @@
 <?php namespace RedbeanTraversing;
 
 trait SQLConditionBuilder {
-	protected	$withSql = '',
+	protected	$withSql = 'AND ',
 				$withParams = [];
 
 	/** 
