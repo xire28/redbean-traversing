@@ -1,5 +1,5 @@
 # Redbean traversing
-Add traversing through associations for redbeans
+Add traversing through associations with scopes for redbeans
 
 ## Requirements
 
@@ -12,8 +12,12 @@ Add traversing through associations for redbeans
 composer require xire28/redbean-traversing
 ```
 
-## Examples
+## Note
+This package is composed of two parts:
+- `MulticallProxy` to use a collection like an object and apply the operation on all the items simultaneously
+- `SQLConditionBuilder` to progressively construct the SQL query filter
 
+## Examples
 ### Seeds
 
 - United States of America
@@ -38,7 +42,7 @@ class Model_Country extends RedBean_SimpleModel
 {
   use RedbeanTraversing\ModelTraversing;
   public function people(){
-    return $this->manyThrough(['ownState', 'ownPerson']);
+    return $this->multi()->ownState->ownPerson;
   }
 }
 
@@ -56,63 +60,43 @@ echo '</ul>';
 ```
 - Lionel Richie
 - Felicia Day
-- John Doe
-- Logan Grove
 - Anna Graceman
 - Emma Stone
 ```
 
-### Retrieve the country of a person
-
-```
-<?php
-
-class Model_Person extends RedBean_SimpleModel
-{
-  use RedbeanTraversing\ModelTraversing;
-  public function country(){
-    return $this->oneThrough(['state', 'country']);
-  }
-}
-
-$lionelRichie = R::load('person', 1);
-echo $lionelRichie->country()->name;
-
-?>
-```
-
-#### Output
-```
-United States of America
-```
-
-### Retrieve all adult persons in the usa using named scopes
+### Retrieve all adult persons in the usa
 ```
 <?php
 
 class BaseModel extends RedBean_SimpleModel
 {
-  use RedbeanTraversing\ModelTraversing;
+  	use RedbeanTraversing\ModelTraversing;
 }
 
 class Model_Country extends BaseModel
 {
-  public function personOlderThan($age){
-    return $this->manyThrough(['ownState', ['personOlderThan', $age]]);
-  }
+	public function adultPersons(){
+    	return $this->proxy()->ownState->_and()->isAdult()->ownPerson;
+	}
 }
 
 class Model_State extends BaseModel
 {
-  public function personOlderThan($age){
-    $this->bean->withCondition('TIMESTAMPDIFF(YEAR, person.born_at, CURDATE()) > ?', [$age]);
-    return $this->ownPerson;
-  }
+  	use PersonScope;
+}
+
+trait PersonScope {
+	public function isAdult(){
+		return $this->personOlderThan(17);
+	}
+	public function personOlderThan($age){
+    	return $this->where('TIMESTAMPDIFF(YEAR, born_at, CURDATE()) > ?', $age);
+	}
 }
 
 $usa = R::load('country', 1);
 echo '<ul>';
-foreach($usa->personOlderThan(17) as $person){
+foreach($usa->adultPersons() as $person){
 	echo "<li>{$person->fullName}</li>";
 }
 echo '</ul>';
@@ -127,3 +111,37 @@ echo '</ul>';
 - Emma Stone
 ```
 
+### Build complex queries
+```
+<?php
+
+class BaseModel extends RedBean_SimpleModel
+{
+  	use RedbeanTraversing\ModelTraversing;
+}
+
+class Model_Country extends BaseModel {}
+class Model_State extends BaseModel {}
+
+$usa = R::load('country', 1);
+echo '<ul>';
+foreach($usa->multi()->_and()->group(function($q){ return $q->where('name LIKE "Ar%"')->_or()->where('name = ?', 'Alabama'); })->ownState->ownPerson as $person){
+	echo "<li>{$person->fullName}</li>";
+}
+echo '</ul>';
+?>
+```
+#### SQL statements generated
+```
+SELECT `country`.* FROM `country` WHERE (`id` IN ( 1 ))
+SELECT `state`.* FROM `state` WHERE country_id = '1' AND ( name LIKE "Ar%" OR name = 'Alabama' )
+SELECT `person`.* FROM `person` WHERE state_id = '1'
+SELECT `person`.* FROM `person` WHERE state_id = '3'
+```
+
+#### Output
+```
+- Lionel Richie
+- Felicia Day
+- Emma Stone
+```
