@@ -10,6 +10,10 @@ class MulticallProxy implements IteratorAggregate {
         $this->collection = $collection;
     }
 
+    public function multi() {
+        return $this;
+    }
+
     /**
      * Try to map callback on all items
      *

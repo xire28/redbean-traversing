@@ -1,7 +1,7 @@
 <?php namespace RedbeanTraversing;
 
 trait SQLConditionBuilder {
-	protected	$withSql = 'AND ',
+	protected	$withSql = '',
 				$withParams = [];
 
 	/** 
@@ -49,7 +49,7 @@ trait SQLConditionBuilder {
 	}
 
 	/** 
-	* Append "WHERE" clause to the sql statement
+	* Append condition to the sql statement
 	* 
 	* @param string $statement
 	* @param array|string $params
@@ -57,6 +57,7 @@ trait SQLConditionBuilder {
 	* @return OODBBean
 	*/
 	public function where($statement, $params = []) {
-		return $this->withStatement($statement, $params);
+		if($this->$withSql === '') $this->_and();
+		return  $this->withStatement($statement, $params) : ;
 	}
 }

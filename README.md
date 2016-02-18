@@ -131,13 +131,6 @@ foreach($usa->multi()->group(function($q){ return $q->where('name LIKE "Ar%"')->
 echo '</ul>';
 ?>
 ```
-#### SQL statements generated
-```
-SELECT `country`.* FROM `country` WHERE (`id` IN ( 1 ))
-SELECT `state`.* FROM `state` WHERE country_id = '1' AND ( name LIKE "Ar%" OR name = 'Alabama' )
-SELECT `person`.* FROM `person` WHERE state_id = '1'
-SELECT `person`.* FROM `person` WHERE state_id = '3'
-```
 
 #### Output
 ```
