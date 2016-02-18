@@ -56,6 +56,16 @@ echo '</ul>';
 ?>
 ```
 
+#### SQL statements generated
+```
+SELECT `country`.* FROM `country` WHERE (`id` IN ( 1 ))
+SELECT `state`.* FROM `state` WHERE country_id = '1'
+SELECT `person`.* FROM `person` WHERE state_id = '1'
+SELECT `person`.* FROM `person` WHERE state_id = '2'
+SELECT `person`.* FROM `person` WHERE state_id = '3'
+SELECT `person`.* FROM `person` WHERE state_id = '4'
+```
+
 #### Output
 ```
 - Lionel Richie
@@ -104,6 +114,16 @@ echo '</ul>';
 ?>
 ```
 
+#### SQL statements generated
+```
+SELECT `country`.* FROM `country` WHERE (`id` IN ( 1 ))
+SELECT `state`.* FROM `state` WHERE country_id = '1'
+SELECT `person`.* FROM `person` WHERE state_id = '1' AND TIMESTAMPDIFF(YEAR, born_at, CURDATE()) > 17
+SELECT `person`.* FROM `person` WHERE state_id = '2' AND TIMESTAMPDIFF(YEAR, born_at, CURDATE()) > 17
+SELECT `person`.* FROM `person` WHERE state_id = '3' AND TIMESTAMPDIFF(YEAR, born_at, CURDATE()) > 17
+SELECT `person`.* FROM `person` WHERE state_id = '4' AND TIMESTAMPDIFF(YEAR, born_at, CURDATE()) > 17
+```
+
 #### Output
 ```
 - Lionel Richie
@@ -130,6 +150,14 @@ foreach($usa->multi()->group(function($q){ return $q->where('name LIKE "Ar%"')->
 }
 echo '</ul>';
 ?>
+```
+
+#### SQL statements generated
+```
+SELECT `country`.* FROM `country` WHERE (`id` IN ( 1 ))
+SELECT `state`.* FROM `state` WHERE country_id = '1' AND ( name LIKE "Ar%" OR name = 'Alabama' )
+SELECT `person`.* FROM `person` WHERE state_id = '1'
+SELECT `person`.* FROM `person` WHERE state_id = '3'
 ```
 
 #### Output

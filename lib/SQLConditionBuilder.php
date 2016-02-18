@@ -42,6 +42,7 @@ trait SQLConditionBuilder {
 	}
 
 	public function group($callback){
+		if($this->$withSql === '') $this->_and();
 		$this->withStatement('(');
 		$callback($this);
 		$this->withStatement(')');
